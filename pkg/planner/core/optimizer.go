@@ -112,7 +112,7 @@ var optRuleList = []base.LogicalOptRule{
 	&MaxMinEliminator{},
 	&rule.ConstantPropagationSolver{},
 	&ConvertOuterToInnerJoin{},
-	&PPDSolver{},
+	&rule.PPDSolver{},
 	&OuterJoinEliminator{},
 	&PartitionProcessor{},
 	&CollectPredicateColumnsPoint{},

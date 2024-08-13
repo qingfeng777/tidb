@@ -16,7 +16,6 @@ package core
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 
 	"github.com/pingcap/errors"
@@ -30,9 +29,6 @@ import (
 	"github.com/pingcap/tidb/pkg/util/ranger"
 )
 
-// PPDSolver stands for Predicate Push Down.
-type PPDSolver struct{}
-
 // exprPrefixAdder is the wrapper struct to add tidb_shard(x) = val for `OrigConds`
 // `cols` is the index columns for a unique shard index
 type exprPrefixAdder struct {
@@ -40,13 +36,6 @@ type exprPrefixAdder struct {
 	OrigConds []expression.Expression
 	cols      []*expression.Column
 	lengths   []int
-}
-
-// Optimize implements base.LogicalOptRule.<0th> interface.
-func (*PPDSolver) Optimize(_ context.Context, lp base.LogicalPlan, opt *optimizetrace.LogicalOptimizeOp) (base.LogicalPlan, bool, error) {
-	planChanged := false
-	_, p := lp.PredicatePushDown(nil, opt)
-	return p, planChanged, nil
 }
 
 func addSelection(p base.LogicalPlan, child base.LogicalPlan, conditions []expression.Expression, chIdx int, opt *optimizetrace.LogicalOptimizeOp) {
@@ -72,11 +61,6 @@ func addSelection(p base.LogicalPlan, child base.LogicalPlan, conditions []expre
 	selection.SetChildren(child)
 	p.Children()[chIdx] = selection
 	logicalop.AppendAddSelectionTraceStep(p, child, selection, opt)
-}
-
-// Name implements base.LogicalOptRule.<1st> interface.
-func (*PPDSolver) Name() string {
-	return "predicate_push_down"
 }
 
 func appendDataSourcePredicatePushDownTraceStep(ds *DataSource, opt *optimizetrace.LogicalOptimizeOp) {
